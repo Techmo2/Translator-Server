@@ -1,4 +1,4 @@
-﻿'use strict';
+'use strict';
 
 var fs = require('fs');
 var https = require('https');
@@ -16,7 +16,6 @@ app.use(bodyParser.json());
 
 var host = 'api.cognitive.microsofttranslator.com';
 var path = '/translate?api-version=3.0';
-//var params = '&to=it';
 
 app.get('/', function (req, res) {
     res.sendFile(__dirname + '/index.html');
@@ -46,16 +45,17 @@ let Translate = function (content, params, response_handler) {
     req.end();
 }
 
-// Translate(JSON.stringify([{ 'Text': text }]), '&to=' + lang, response_handler);
-
 app.post('/translate', function (request, res) {
+
     var id = request.body.id;
     var text = request.body.text;
     var lang = request.body.language;
 
-    console.log('processing request: \n' + JSON.stringify(request.body, null, 4));
-    console.log('Language: "' + lang + '"');
-    console.log('Text: "' + text + '"');
+    if (config.verbose) {
+        console.log('processing request: \n' + JSON.stringify(request.body, null, 4));
+        console.log('Language: "' + lang + '"');
+        console.log('Text: "' + text + '"');
+    }
 
     var response_handler = function (response) {
         var body = '';
@@ -64,12 +64,14 @@ app.post('/translate', function (request, res) {
         });
         response.on('end', function () {
             var json = JSON.parse(body);
-            console.log('recieved translation from microsoft: \n' + JSON.stringify(json, null, 4));
+            if(config.verbose)
+                console.log('recieved translation from microsoft: \n' + JSON.stringify(json, null, 4));
             res.json(json);
             res.end();
         });
         response.on('error', function (e) {
-            console.log('Error: ' + e.message);
+            if(config.verbose)
+                console.log('Error: ' + e.message);
             res.send('error');
             res.end();
         });
@@ -78,10 +80,10 @@ app.post('/translate', function (request, res) {
     Translate(JSON.stringify([{ 'Text': text }]), '&to=' + lang, response_handler);
 });
 
-http.listen(config.port, function () {
-    console.log('Azure api listening on port ' + config.port);
+http.listen(config.azure_port, function () {
+    console.log('Azure api listening on port ' + config.azure_port);
 });
 
-app.listen(1313, function () {
-    console.log('Translator listening on port 1313');
+app.listen(config.translator_port, function () {
+    console.log('Translator listening on port ' + config.translator_port);
 });
