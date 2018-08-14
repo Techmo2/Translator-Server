@@ -1,0 +1,7 @@
+{
+  "azure_port": 1212,
+  "translator_port": 1313,
+  "api_key": "yourkeyhere",
+  "filter_profanity": false,
+  "verbose":  true
+}
